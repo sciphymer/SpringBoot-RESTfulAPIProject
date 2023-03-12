@@ -17,7 +17,7 @@ public class ScheduleService {
     ScheduleRepository scheduleRepository;
 
     public Schedule createSchedule(Schedule schedule){
-        return scheduleRepository.save(schedule);
+        return (schedule!=null)? scheduleRepository.save(schedule):null;
     }
 
     public List<Schedule> getAllSchedules(){
@@ -25,26 +25,32 @@ public class ScheduleService {
     }
 
     public List<Schedule> findScheduleByPetId (Long petId) throws ResourceNotFoundException{
-       Optional<List<Schedule>> schedules = scheduleRepository.findScheduleByPetId(petId);
-       return schedules.orElseThrow(
-               ()->new ResourceNotFoundException(
-               String.format("The schedule of Pet Id: %s cannot be found",petId)
-       ));
+        if(petId!=null) {
+            Optional<List<Schedule>> schedules = scheduleRepository.findScheduleByPetId(petId);
+            return schedules.orElseThrow(
+                    () -> new ResourceNotFoundException(
+                            String.format("The schedule of Pet Id: %s cannot be found", petId)
+                    ));
+        } return null;
     }
 
     public List<Schedule> findScheduleByEmployeeId (Long employeeId) throws ResourceNotFoundException{
-        Optional<List<Schedule>> schedules = scheduleRepository.findScheduleByEmployeeId(employeeId);
-        return schedules.orElseThrow(
-                ()->new ResourceNotFoundException(
-                        String.format("The schedule of Employee Id: %s cannot be found",employeeId)
-                ));
+        if(employeeId!=null) {
+            Optional<List<Schedule>> schedules = scheduleRepository.findScheduleByEmployeeId(employeeId);
+            return schedules.orElseThrow(
+                    () -> new ResourceNotFoundException(
+                            String.format("The schedule of Employee Id: %s cannot be found", employeeId)
+                    ));
+        } else return null;
     }
 
     public List<Schedule> findScheduleByCustomerId (Long customerId) throws ResourceNotFoundException{
-        Optional<List<Schedule>> schedules = scheduleRepository.findScheduleByCustomerId(customerId);
-        return schedules.orElseThrow(
-                ()->new ResourceNotFoundException(
-                        String.format("The schedule of Customer Id: %s cannot be found",customerId)
-                ));
+        if(customerId!=null) {
+            Optional<List<Schedule>> schedules = scheduleRepository.findScheduleByCustomerId(customerId);
+            return schedules.orElseThrow(
+                    () -> new ResourceNotFoundException(
+                            String.format("The schedule of Customer Id: %s cannot be found", customerId)
+                    ));
+        } else return null;
     }
 }

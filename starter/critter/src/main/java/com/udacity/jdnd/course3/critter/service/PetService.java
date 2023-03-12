@@ -21,11 +21,11 @@ public class PetService {
     }
 
     public Pet getPetById(Long petId) throws ResourceNotFoundException {
-        return petRepository.findById(petId).orElseThrow(
+        return (petId!=null)?petRepository.findById(petId).orElseThrow(
                 ()-> new ResourceNotFoundException(
                         String.format("Pet id: %s cannot be found", petId)
                 )
-        );
+        ):null;
     }
 
     public List<Pet> getPets(){
@@ -33,10 +33,14 @@ public class PetService {
     }
 
     public List<Pet> getPetsByOwnerId(Long ownerId) throws ResourceNotFoundException{
-        return petRepository.getPetsByOwnerId(ownerId).orElseThrow(
+        return (ownerId!=null)?petRepository.getPetsByOwnerId(ownerId).orElseThrow(
                 ()-> new ResourceNotFoundException(
                         String.format("No pets are not on this owner id: %s", ownerId)
                 )
-        );
+        ):null;
+    }
+
+    public List<Pet> getAllPetsByIds(List<Long> petIds){
+        return (petIds != null) ? petRepository.findAllById(petIds) : null;
     }
 }

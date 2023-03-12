@@ -13,8 +13,8 @@ import java.util.Set;
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee,Long> {
     @Query("SELECT e FROM Employee e " +
-            "WHERE e.skills in :employeeSkills " +
-            "AND e.daysAvailable = :daysAvailable")
+            "WHERE e.skills IS NULL OR e.skills in :employeeSkills " +
+            "AND e.daysAvailable IS NULL OR e.daysAvailable = :daysAvailable")
     List<Employee> findEmployeeBySkillsAndDateAvailable(Set<EmployeeSkill> employeeSkills, DayOfWeek daysAvailable);
 
 }

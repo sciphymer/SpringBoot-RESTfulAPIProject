@@ -23,24 +23,33 @@ public class EmployeeService {
         return employeeRepository.save(employee);
     }
     public Employee findEmployeeById(Long employeeId) throws ResourceNotFoundException {
-        return employeeRepository.findById(employeeId)
+        return (employeeId!=null)?
+                employeeRepository.findById(employeeId)
                 .orElseThrow(()-> new ResourceNotFoundException(
                         String.format("Employee of id: %s cannot be found",employeeId)
-                ));
+                )):null;
+    }
+
+    public List<Employee> findAllEmployeesByIds(List<Long> employeeIds){
+        return (employeeIds!=null) ? employeeRepository.findAllById(employeeIds):null;
     }
 
     public Employee setEmployeeAvailability(Set<DayOfWeek> daysAvailable, Long employeeId) throws ResourceNotFoundException{
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(()-> new ResourceNotFoundException(
-                        String.format("Employee of id: %s cannot be found",employeeId)
-                ));
-        employee.getDaysAvailable().addAll(daysAvailable);
-        return employeeRepository.save(employee);
+        if(employeeId!=null && employeeId !=null) {
+            Employee employee = employeeRepository.findById(employeeId)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            String.format("Employee of id: %s cannot be found", employeeId)
+                    ));
+            employee.getDaysAvailable().addAll(daysAvailable);
+            return employeeRepository.save(employee);
+        } else{
+            return null;
+        }
+
     }
 
     public List<Employee> findEmployeeBySkillsAndDateAvailable(Set<EmployeeSkill> employeeSkills, DayOfWeek daysAvailable){
         return employeeRepository.findEmployeeBySkillsAndDateAvailable(employeeSkills, daysAvailable);
-
     }
 
 

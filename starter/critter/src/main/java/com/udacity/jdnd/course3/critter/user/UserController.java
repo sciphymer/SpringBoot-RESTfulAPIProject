@@ -1,8 +1,10 @@
 package com.udacity.jdnd.course3.critter.user;
 
 import com.udacity.jdnd.course3.critter.exception.ResourceNotFoundException;
+import com.udacity.jdnd.course3.critter.pet.Pet;
 import com.udacity.jdnd.course3.critter.service.CustomerService;
 import com.udacity.jdnd.course3.critter.service.EmployeeService;
+import com.udacity.jdnd.course3.critter.service.PetService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +24,21 @@ import java.util.stream.Collectors;
 @RequestMapping("/user")
 public class UserController {
 
+    static CustomerService customerService;
+    static EmployeeService employeeService;
+    static PetService petService;
     @Autowired
-    CustomerService customerService;
-
+    public void setCustomerService(CustomerService customerService) {
+        this.customerService = customerService;
+    }
     @Autowired
-    EmployeeService employeeService;
+    public void setEmployeeService(EmployeeService employeeService) {
+        this.employeeService = employeeService;
+    }
+    @Autowired
+    public void setPetService(PetService petService) {
+        this.petService = petService;
+    }
 
     @PostMapping("/customer")
     public CustomerDTO saveCustomer(@RequestBody CustomerDTO customerDTO){
@@ -89,12 +101,24 @@ public class UserController {
     private static CustomerDTO convertCustomerToCustomerDTO(Customer customer){
         CustomerDTO customerDTO = new CustomerDTO();
         BeanUtils.copyProperties(customer, customerDTO);
+        try {
+            List<Long> petIds = customer.getPets().stream().map(pet -> pet.getId()).collect(Collectors.toList());
+            customerDTO.setPetIds(petIds);
+        } catch (NullPointerException e){
+            System.out.println(e.getMessage());
+        }
         return customerDTO;
     }
 
     private static Customer convertCustomerDTOToCustomer(CustomerDTO customerDTO){
         Customer customer = new Customer();
         BeanUtils.copyProperties(customerDTO,customer);
+        try {
+            List<Pet> pets = petService.getAllPetsByIds(customerDTO.getPetIds());
+            customer.setPets(pets);
+        } catch (NullPointerException e){
+            System.out.println(e.getMessage());
+        }
         return customer;
     }
 

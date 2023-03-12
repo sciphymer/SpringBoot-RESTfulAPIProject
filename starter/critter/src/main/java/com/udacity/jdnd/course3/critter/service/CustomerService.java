@@ -25,11 +25,19 @@ public class CustomerService {
     }
 
     public Customer getOwnerByPetId(Long petId) throws ResourceNotFoundException {
-        return customerRepository.findByPetId(petId).orElseThrow(
+        return (petId!=null)?customerRepository.findByPetId(petId).orElseThrow(
                 ()-> new ResourceNotFoundException(
                         String.format("No customers are the owner of this pet: %s", petId)
                 )
-        );
+        ):null;
+    }
+
+    public Customer getCustomerById(Long ownerId) throws ResourceNotFoundException{
+        return (ownerId!=null)?customerRepository.findById(ownerId).orElseThrow(
+                ()-> new ResourceNotFoundException(
+                        String.format("Owner with id: %s is not found", ownerId)
+                )
+        ):null;
     }
 
 

@@ -1,7 +1,11 @@
 package com.udacity.jdnd.course3.critter.schedule;
 
 import com.udacity.jdnd.course3.critter.exception.ResourceNotFoundException;
+import com.udacity.jdnd.course3.critter.pet.Pet;
+import com.udacity.jdnd.course3.critter.service.EmployeeService;
+import com.udacity.jdnd.course3.critter.service.PetService;
 import com.udacity.jdnd.course3.critter.service.ScheduleService;
+import com.udacity.jdnd.course3.critter.user.Employee;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +19,17 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/schedule")
 public class ScheduleController {
+    static ScheduleService scheduleService;
+    static EmployeeService employeeService;
 
     @Autowired
-    ScheduleService scheduleService;
+    public void setScheduleService(ScheduleService scheduleService) {
+        this.scheduleService = scheduleService;
+    }
+    @Autowired
+    public void setEmployeeService(EmployeeService employeeService) {
+        this.employeeService = employeeService;
+    }
 
     @PostMapping
     public ScheduleDTO createSchedule(@RequestBody ScheduleDTO scheduleDTO) {
@@ -65,14 +77,39 @@ public class ScheduleController {
     }
 
     private Schedule convertScheduleDTOToSchedule(ScheduleDTO scheduleDTO){
+        PetService petService = new PetService();
         Schedule schedule = new Schedule();
         BeanUtils.copyProperties(scheduleDTO,schedule);
+        try {
+            List<Employee> employees = employeeService.findAllEmployeesByIds(scheduleDTO.getEmployeeIds());
+            schedule.setEmployees(employees);
+            List<Pet> pets = petService.getAllPetsByIds(scheduleDTO.getPetIds());
+            schedule.setPets(pets);
+        } catch (NullPointerException e){
+            System.out.println(e.getMessage());
+        }
         return schedule;
     }
 
     private ScheduleDTO convertScheduleToScheduleDTO(Schedule schedule){
         ScheduleDTO scheduleDTO = new ScheduleDTO();
         BeanUtils.copyProperties(schedule,scheduleDTO);
+        try {
+            scheduleDTO.setEmployeeIds(
+                    schedule.getEmployees().stream()
+                            .map(employee -> employee.getId()).collect(Collectors.toList())
+            );
+        } catch (NullPointerException e){
+            System.out.println(e.getMessage());
+        }
+        try {
+            scheduleDTO.setPetIds(
+                    schedule.getPets().stream()
+                            .map(pet -> pet.getId()).collect(Collectors.toList())
+            );
+        } catch (NullPointerException e){
+            System.out.println(e.getMessage());
+        }
         return scheduleDTO;
     }
 }
