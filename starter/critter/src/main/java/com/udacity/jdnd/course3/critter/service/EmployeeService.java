@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -20,6 +21,7 @@ public class EmployeeService {
     EmployeeRepository employeeRepository;
 
     public Employee save(Employee employee){
+
         return employeeRepository.save(employee);
     }
     public Employee findEmployeeById(Long employeeId) throws ResourceNotFoundException {
@@ -35,12 +37,12 @@ public class EmployeeService {
     }
 
     public Employee setEmployeeAvailability(Set<DayOfWeek> daysAvailable, Long employeeId) throws ResourceNotFoundException{
-        if(employeeId!=null && employeeId !=null) {
+        if(daysAvailable!=null && employeeId !=null) {
             Employee employee = employeeRepository.findById(employeeId)
                     .orElseThrow(() -> new ResourceNotFoundException(
                             String.format("Employee of id: %s cannot be found", employeeId)
                     ));
-            employee.getDaysAvailable().addAll(daysAvailable);
+            employee.setDaysAvailable(daysAvailable);
             return employeeRepository.save(employee);
         } else{
             return null;
@@ -48,8 +50,15 @@ public class EmployeeService {
 
     }
 
-    public List<Employee> findEmployeeBySkillsAndDateAvailable(Set<EmployeeSkill> employeeSkills, DayOfWeek daysAvailable){
-        return employeeRepository.findEmployeeBySkillsAndDateAvailable(employeeSkills, daysAvailable);
+    public List<Employee> findEmployeeByDateAvailableAndSkills(DayOfWeek daysAvailable, Set<EmployeeSkill> skills){
+        List<Employee> employees = new ArrayList<>();
+        List<Employee> employeesAvailable = employeeRepository.findEmployeeByDateAvailable(daysAvailable);
+        for(Employee e: employeesAvailable){
+            if(e.getSkills().containsAll(skills)){
+                employees.add(e);
+            }
+        }
+        return employees;
     }
 
 
