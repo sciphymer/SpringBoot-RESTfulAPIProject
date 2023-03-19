@@ -13,7 +13,7 @@ import java.util.Set;
 @Entity
 public class Schedule {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @OneToMany
     @JoinColumn(name = "schedule_id")

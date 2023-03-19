@@ -12,6 +12,6 @@ public interface CustomerRepository extends JpaRepository<Customer,Long> {
     @Query("SELECT c FROM Customer c " +
             "JOIN c.pets pet " +
             "WHERE pet.id = :petId")
-    Optional<Customer> findByPetId(Long petId);
+    Optional<Customer> findCustomerByPetId(Long petId);
 
 }
