@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -57,7 +58,7 @@ public class UserController {
     @GetMapping("/customer/pet/{petId}")
     public CustomerDTO getOwnerByPet(@PathVariable long petId){
         try {
-            Customer owner = customerService.getOwnerByPetId(petId);
+            Customer owner = customerService.findCustomerByPetId(petId);
             return convertCustomerToCustomerDTO(owner);
         } catch (ResourceNotFoundException e){
             System.out.println(e.getMessage());
@@ -93,9 +94,15 @@ public class UserController {
 
     @GetMapping("/employee/availability")
     public List<EmployeeDTO> findEmployeesForService(@RequestBody EmployeeRequestDTO employeeDTO) {
-        List<Employee> employees = employeeService.findEmployeeBySkillsAndDateAvailable(employeeDTO.getSkills(),employeeDTO.getDate().getDayOfWeek());
-        return employees.stream().map(employee -> convertEmployeeToEmployeeDTO(employee))
-                .collect(Collectors.toList());
+        Set<EmployeeSkill> skills = employeeDTO.getSkills();
+        LocalDate availableDay =  employeeDTO.getDate();
+        if(skills!=null && availableDay!=null) {
+            List<Employee> employees = employeeService.findEmployeeByDateAvailableAndSkills(availableDay.getDayOfWeek(), skills);
+            return employees.stream().map(employee -> convertEmployeeToEmployeeDTO(employee))
+                    .collect(Collectors.toList());
+        } else {
+            return null;
+        }
     }
 
     private static CustomerDTO convertCustomerToCustomerDTO(Customer customer){

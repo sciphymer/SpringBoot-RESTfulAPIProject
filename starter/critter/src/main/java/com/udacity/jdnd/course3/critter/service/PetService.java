@@ -17,7 +17,14 @@ public class PetService {
     PetRepository petRepository;
 
     public Pet save(Pet pet){
-        return petRepository.save(pet);
+        try {
+            Pet existingPet = getPetById(pet.getId());
+            pet.setId(existingPet.getId());
+            return petRepository.save(pet);
+        } catch(ResourceNotFoundException e){
+            return petRepository.save(pet);
+        }
+
     }
 
     public Pet getPetById(Long petId) throws ResourceNotFoundException {

@@ -8,6 +8,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 public class PetController {
     static PetService petService;
     static CustomerService customerService;
+
     @Autowired
     public void setPetService(PetService petService) {
         PetController.petService = petService;
@@ -30,8 +32,12 @@ public class PetController {
 
     @PostMapping
     public PetDTO savePet(@RequestBody PetDTO petDTO) {
-        Pet pet = convertPetDTOToPet(petDTO);
-        return convertPetToPetDTO(petService.save(pet));
+        Pet savedPet = petService.save(convertPetDTOToPet(petDTO));
+        Long ownerId = savedPet.getCustomer().getId();
+        if(ownerId!=null){
+            setPetToCustomerIfPetNotExist(ownerId,savedPet);
+        }
+        return convertPetToPetDTO(savedPet);
     }
 
     @GetMapping("/{petId}")
@@ -84,5 +90,16 @@ public class PetController {
             System.out.println(e.getMessage());
         }
         return pet;
+    }
+
+    static void setPetToCustomerIfPetNotExist(Long ownerId, Pet pet){
+        Customer existingCustomer;
+        try {
+            existingCustomer = customerService.getCustomerById(ownerId);
+            existingCustomer.setPets(Arrays.asList(pet));
+            customerService.save(existingCustomer);
+        } catch (ResourceNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

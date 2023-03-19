@@ -28,6 +28,14 @@ public class Customer extends User{
     }
 
     public void setPets(List<Pet> pets) {
-        this.pets = pets;
+        if(this.pets == null) {
+            this.pets = pets;
+        } else {
+          for(Pet pet: pets){
+              if(!this.pets.contains(pet)){
+                  this.pets.add(pet);
+              }
+          }
+        }
     }
 }
