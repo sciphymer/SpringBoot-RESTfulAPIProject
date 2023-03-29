@@ -15,10 +15,10 @@ public class Schedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @OneToMany
+    @ManyToMany
     @JoinColumn(name = "schedule_id")
     private List<Employee> employees = new ArrayList<>();
-    @OneToMany
+    @ManyToMany
     @JoinColumn(name = "schedule_id")
     private List<Pet> pets = new ArrayList<>();
 

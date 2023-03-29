@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class ScheduleController {
     static ScheduleService scheduleService;
     static EmployeeService employeeService;
+    static PetService petService;
 
     @Autowired
     public void setScheduleService(ScheduleService scheduleService) {
@@ -30,11 +31,16 @@ public class ScheduleController {
     public void setEmployeeService(EmployeeService employeeService) {
         this.employeeService = employeeService;
     }
-
+    @Autowired
+    public void setPetService(PetService petService) {this.petService = petService;}
     @PostMapping
     public ScheduleDTO createSchedule(@RequestBody ScheduleDTO scheduleDTO) {
-        Schedule schedule = scheduleService.createSchedule(convertScheduleDTOToSchedule(scheduleDTO));
-        return convertScheduleToScheduleDTO(schedule);
+        List<Long> employeeIds = scheduleDTO.getEmployeeIds();
+        List<Long> petIds = scheduleDTO.getPetIds();
+        if(employeeIds.size()>0 && petIds.size()>0){
+            Schedule schedule = scheduleService.createSchedule(convertScheduleDTOToSchedule(scheduleDTO));
+            return convertScheduleToScheduleDTO(schedule);
+        } else return null;
     }
 
     @GetMapping
@@ -77,7 +83,6 @@ public class ScheduleController {
     }
 
     private Schedule convertScheduleDTOToSchedule(ScheduleDTO scheduleDTO){
-        PetService petService = new PetService();
         Schedule schedule = new Schedule();
         BeanUtils.copyProperties(scheduleDTO,schedule);
         try {
